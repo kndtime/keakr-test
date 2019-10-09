@@ -11,11 +11,19 @@ import android.view.ViewGroup
 
 import com.example.keakr.R
 import android.graphics.Shader
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.ShapeDrawable
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.keakr.data.model.Response
+import com.example.keakr.data.model.User
 import kotlinx.android.synthetic.main.profile_fragment.*
+
+
 
 
 class ProfileFragment : Fragment() {
@@ -40,12 +48,27 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
+        changeBackgroundGradiant("#FFFFFF")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel.get_profile(15)
+        viewModel.get_keaks(15)
+        viewModel.get_response().observeForever(object : Observer<Response> {
+            override fun onChanged(someData: Response?) {
+                // do something with someData
+                if (someData == null)
+                    return
+                if (someData.user != null){
+                    setProfile(someData.user)
+                    changeBackgroundGradiant(someData.user.dominantColor!!)
+                } else {
+                    beatAdapter.addItems(someData.items.subList(0, 3))
+                }
+            }
+        })
     }
 
     private fun initViews(){
@@ -56,19 +79,19 @@ class ProfileFragment : Fragment() {
         setRecyclerViewScrollListener()
     }
 
+    private fun setProfile(user: User){
+        username.text = user.username
+        bio.text = user.biography
+        Glide.with(context!!)
+            .load(user.pictureUrl)
+            .into(picture)
+    }
+
     private fun changeBackgroundGradiant(dominantColor : String){
-        val h = v.height
-        val mDrawable = ShapeDrawable(RectShape())
-        mDrawable.paint.shader = LinearGradient(
-            0f,
-            0f,
-            0f,
-            h.toFloat(),
-            Color.parseColor(dominantColor),
-            Color.parseColor("#131314"),
-            Shader.TileMode.REPEAT
+        val drawable = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(Color.parseColor(dominantColor), resources.getColor(android.R.color.transparent))
         )
-        v.background = mDrawable
+        v.background = drawable
     }
 
     private fun setRecyclerViewScrollListener() {

@@ -9,6 +9,8 @@ import com.bumptech.glide.Glide
 import com.example.keakr.R
 import com.example.keakr.data.model.Beat
 import kotlinx.android.synthetic.main.beat_list_item_layout.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class BeatAdapter(val context: Context) : RecyclerView.Adapter<BeatViewHolder>(){
 
@@ -26,6 +28,17 @@ class BeatAdapter(val context: Context) : RecyclerView.Adapter<BeatViewHolder>()
 
     override fun onBindViewHolder(holder: BeatViewHolder, position: Int) {
         holder.bind(items[holder.adapterPosition])
+    }
+
+    fun add(beat : Beat){
+        items.add(beat)
+        notifyItemInserted(items.size - 1)
+    }
+
+    fun addItems(beats : List<Beat>){
+        for (beat : Beat in beats){
+            add(beat)
+        }
     }
 
 }

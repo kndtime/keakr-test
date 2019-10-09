@@ -1,6 +1,7 @@
 package com.example.keakr.di
 
 import com.example.keakr.BuildConfig
+import com.example.keakr.data.model.Beat
 import com.example.keakr.data.remote.KeakrService
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -21,7 +22,7 @@ import javax.inject.Singleton
 
 @Module
 object KeakrModule {
-
+    var keaks = Types.newParameterizedType(List::class.java, Beat::class.java)
 
     /**
      * Provides the Post service implementation.
@@ -64,6 +65,7 @@ object KeakrModule {
     fun provideMoshi(): Moshi {
         val moshi =  Moshi.Builder()
             .build()
+        val keaksAdapter : JsonAdapter<ArrayList<Beat>> = moshi.adapter(keaks)
         return moshi
     }
 
