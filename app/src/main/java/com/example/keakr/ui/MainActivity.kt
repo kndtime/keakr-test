@@ -2,6 +2,7 @@ package com.example.keakr.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -36,5 +37,19 @@ class MainActivity : AppCompatActivity(), ProfileFragment.OnSeeMoreClickedListen
         supportFragmentManager.inTransaction { add(frameId, fragment)
             .addToBackStack(fragment.javaClass.name)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN) }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        when (item.itemId) {
+            android.R.id.home -> {
+                // NavUtils.navigateUpFromSameTask(this);
+                super.onBackPressed()
+                return true
+            }
+        }
+        return true
     }
 }

@@ -13,7 +13,9 @@ data class User(
     @field:Json(name = "biography") val biography : String?,
     @field:Json(name = "stats") val stats: Stats?,
     @field:Json(name = "dominantColor") val dominantColor : String?
-) : Parcelable
+) : Parcelable {
+    constructor() : this(null, null, null, null, null, null, null)
+}
 
 @Parcelize
 data class Stats(

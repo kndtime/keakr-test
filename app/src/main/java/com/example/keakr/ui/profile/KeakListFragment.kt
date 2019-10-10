@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.keakr.R
 import com.example.keakr.data.model.Beat
 import com.example.keakr.data.model.Response
+import kotlinx.android.synthetic.main.fragment_keak_list.*
 import kotlinx.android.synthetic.main.profile_fragment.*
+import kotlinx.android.synthetic.main.profile_fragment.list
 
 /**
  * A simple [Fragment] subclass.
@@ -49,10 +52,18 @@ class KeakListFragment : Fragment() {
         initViews()
     }
 
+    private fun initToolbar() {
+        toolbar.title = ""
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        (activity as AppCompatActivity).supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_back_grey)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayUseLogoEnabled(true)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
-        //viewModel.get_keaks(15)
+        viewModel.get_keaks(15)
         viewModel.get_response().observeForever(object : Observer<Response> {
             override fun onChanged(someData: Response?) {
                 // do something with someData
@@ -64,9 +75,10 @@ class KeakListFragment : Fragment() {
     }
 
     private fun initViews(){
+        initToolbar()
         val llm = LinearLayoutManager(context)
         list.layoutManager = llm
-        beatAdapter = BeatAdapter(context!!)
+        beatAdapter = BeatAdapter(context!!, false)
         list.adapter  = beatAdapter
         setRecyclerViewScrollListener()
     }

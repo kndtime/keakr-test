@@ -35,7 +35,6 @@ class ProfileFragment : Fragment() {
     private lateinit var beatAdapter: BeatAdapter
     private var listener: OnSeeMoreClickedListener? = null
 
-
     private var beats : ArrayList<Beat> = ArrayList()
     companion object {
         fun newInstance() = ProfileFragment()
@@ -68,7 +67,7 @@ class ProfileFragment : Fragment() {
                 if (someData == null)
                     return
                 if (someData.user != null){
-                    setProfile(someData.user)
+                    beatAdapter.setUser(someData.user)
                     changeBackgroundGradiant(someData.user.dominantColor!!)
                 } else {
                     beats.addAll(someData.items)
@@ -81,20 +80,8 @@ class ProfileFragment : Fragment() {
     private fun initViews(){
         val llm = LinearLayoutManager(context)
         list.layoutManager = llm
-        beatAdapter = BeatAdapter(context!!)
+        beatAdapter = BeatAdapter(context!!, true, listener)
         list.adapter  = beatAdapter
-        setRecyclerViewScrollListener()
-    }
-
-    private fun setProfile(user: User){
-        username.text = user.username
-        bio.text = user.biography
-        Glide.with(context!!)
-            .load(user.pictureUrl)
-            .into(picture)
-        seemore.setOnClickListener {
-            listener?.onSeeMoreClicked(beats)
-        }
     }
 
     private fun changeBackgroundGradiant(dominantColor : String){
@@ -102,24 +89,6 @@ class ProfileFragment : Fragment() {
             GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(Color.parseColor(dominantColor), resources.getColor(android.R.color.transparent))
         )
         v.background = drawable
-    }
-
-    private fun setRecyclerViewScrollListener() {
-        scrollListener = object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                val totalItemCount = recyclerView.layoutManager?.itemCount
-                val lastVisibleItemPosition: LinearLayoutManager? = recyclerView.layoutManager as LinearLayoutManager?
-                if (totalItemCount!! == lastVisibleItemPosition?.findLastVisibleItemPosition()?.plus(1)!!) {
-                    loadData(totalItemCount!!)
-                    var maxCount = 15
-                    if (maxCount != 0 && maxCount + 1 <= totalItemCount){
-                        recyclerView.removeOnScrollListener(scrollListener)
-                    }
-                }
-            }
-        }
-        list.addOnScrollListener(scrollListener)
     }
 
     override fun onAttach(context: Context) {
@@ -134,12 +103,6 @@ class ProfileFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
-    }
-
-    private fun loadData(page : Int){
-        if (page == -1)
-            return
-        //TODO: DO the query
     }
 
     interface OnSeeMoreClickedListener{
