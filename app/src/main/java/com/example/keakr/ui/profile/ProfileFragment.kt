@@ -1,5 +1,6 @@
 package com.example.keakr.ui.profile
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.LinearGradient
 import androidx.lifecycle.ViewModelProviders
@@ -19,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.keakr.data.model.Beat
 import com.example.keakr.data.model.Response
 import com.example.keakr.data.model.User
 import kotlinx.android.synthetic.main.profile_fragment.*
@@ -31,6 +33,10 @@ class ProfileFragment : Fragment() {
     private lateinit var v : View
     private lateinit var scrollListener: RecyclerView.OnScrollListener
     private lateinit var beatAdapter: BeatAdapter
+    private var listener: OnSeeMoreClickedListener? = null
+
+
+    private var beats : ArrayList<Beat> = ArrayList()
     companion object {
         fun newInstance() = ProfileFragment()
     }
@@ -65,6 +71,7 @@ class ProfileFragment : Fragment() {
                     setProfile(someData.user)
                     changeBackgroundGradiant(someData.user.dominantColor!!)
                 } else {
+                    beats.addAll(someData.items)
                     beatAdapter.addItems(someData.items.subList(0, 3))
                 }
             }
@@ -85,6 +92,9 @@ class ProfileFragment : Fragment() {
         Glide.with(context!!)
             .load(user.pictureUrl)
             .into(picture)
+        seemore.setOnClickListener {
+            listener?.onSeeMoreClicked(beats)
+        }
     }
 
     private fun changeBackgroundGradiant(dominantColor : String){
@@ -112,10 +122,28 @@ class ProfileFragment : Fragment() {
         list.addOnScrollListener(scrollListener)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnSeeMoreClickedListener) {
+            listener = context
+        } else {
+            throw RuntimeException(context.toString() + " must implement OnSeeMoreClickedListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
+
     private fun loadData(page : Int){
         if (page == -1)
             return
         //TODO: DO the query
+    }
+
+    interface OnSeeMoreClickedListener{
+        fun onSeeMoreClicked(beats : List<Beat>)
     }
 
 }
